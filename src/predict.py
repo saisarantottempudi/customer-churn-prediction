@@ -102,7 +102,7 @@ def preprocess_single_customer(customer_dict: dict, config: dict) -> pd.DataFram
     """Convert a single customer dict to a DataFrame ready for pipeline transform."""
     df = pd.DataFrame([customer_dict])
     # Standardize
-    str_cols = df.select_dtypes(include=["object", "str"]).columns
+    str_cols = df.select_dtypes(include="object").columns
     for col in str_cols:
         df[col] = df[col].str.strip()
     # Fix TotalCharges
