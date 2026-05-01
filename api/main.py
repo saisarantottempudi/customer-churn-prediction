@@ -12,39 +12,39 @@ Endpoints:
 import json
 import logging
 import os
-import sys
 from contextlib import asynccontextmanager
 from typing import List
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import joblib
+import pandas as pd
+import yaml
+from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy.orm import Session
 
-import pandas as pd  # noqa: E402
-import yaml  # noqa: E402
-from fastapi import FastAPI, HTTPException, Depends, status  # noqa: E402
-from fastapi.middleware.cors import CORSMiddleware  # noqa: E402
-from sqlalchemy.orm import Session  # noqa: E402
-
-from api.schemas import (  # noqa: E402
-    CustomerInput, PredictionResponse, HealthResponse,
-    ModelInfoResponse, BatchPredictionResponse, BatchPredictionRow,
+from api.database import get_db, init_db, log_prediction
+from api.schemas import (
+    BatchPredictionResponse,
+    BatchPredictionRow,
+    CustomerInput,
+    HealthResponse,
+    ModelInfoResponse,
+    PredictionResponse,
 )
-from api.database import init_db, get_db, log_prediction  # noqa: E402
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 
-# Global model state
 _model_state: dict = {}
 
 
-def _load_config():
+def _load_config() -> dict:
     config_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "config.yaml")
     with open(config_path) as f:
         return yaml.safe_load(f)
 
 
 def _load_models():
-    import joblib
     config = _load_config()
     model = joblib.load(config["model"]["path"])
     pipeline = joblib.load(config["model"]["pipeline_path"])
@@ -55,7 +55,6 @@ def _load_models():
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup
     init_db()
     try:
         model, pipeline, metadata, config = _load_models()
@@ -68,7 +67,6 @@ async def lifespan(app: FastAPI):
         logger.error(f"Failed to load model: {e}")
         _model_state["model"] = None
     yield
-    # Shutdown
     _model_state.clear()
 
 
@@ -96,10 +94,6 @@ def _get_model():
         )
     return _model_state["model"], _model_state["pipeline"], _model_state["metadata"], _model_state["config"]
 
-
-# ---------------------------------------------------------------------------
-# Endpoints
-# ---------------------------------------------------------------------------
 
 @app.get("/health", response_model=HealthResponse, tags=["System"])
 def health_check():
@@ -133,7 +127,7 @@ def predict_single(customer: CustomerInput, db: Session = Depends(get_db)):
     Returns churn probability, risk segment, top churn reasons,
     and a personalised retention recommendation.
     """
-    model, pipeline, metadata, config = _get_model()
+    _get_model()
 
     from src.predict import predict_single as _predict
     from src.recommendation_engine import build_full_recommendation_output
@@ -148,7 +142,6 @@ def predict_single(customer: CustomerInput, db: Session = Depends(get_db)):
         logger.error(f"Prediction error: {e}")
         raise HTTPException(status_code=500, detail=f"Prediction failed: {str(e)}")
 
-    # Persist to DB
     try:
         log_prediction(db, full_output)
     except Exception as e:
@@ -173,8 +166,6 @@ def predict_batch(customers: List[CustomerInput], db: Session = Depends(get_db))
         r["TotalCharges"] = str(r["TotalCharges"])
 
     df = pd.DataFrame(records)
-    # Rename to match dataset convention
-    df = df.rename(columns={"customerID": "customerID"})
 
     try:
         results = _batch_predict(df)
@@ -205,6 +196,7 @@ def predict_batch(customers: List[CustomerInput], db: Session = Depends(get_db))
 def get_prediction_history(limit: int = 50, db: Session = Depends(get_db)):
     """Retrieve the most recent prediction records from the database."""
     from api.database import PredictionLog
+
     records = (
         db.query(PredictionLog)
         .order_by(PredictionLog.created_at.desc())

@@ -4,19 +4,28 @@ Model evaluation module for the Customer Churn Prediction system.
 Generates comprehensive evaluation metrics, plots, and a model report.
 """
 
-import logging
-import os
-import numpy as np
-import pandas as pd
+# matplotlib backend must be set before pyplot is imported
 import matplotlib
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt  # noqa: E402
-import seaborn as sns  # noqa: E402
 
+import logging  # noqa: E402
+import os  # noqa: E402
+
+import matplotlib.pyplot as plt  # noqa: E402
+import numpy as np  # noqa: E402
+import pandas as pd  # noqa: E402
+import seaborn as sns  # noqa: E402
 from sklearn.metrics import (  # noqa: E402
-    accuracy_score, precision_score, recall_score, f1_score,
-    roc_auc_score, confusion_matrix, classification_report,
-    roc_curve, precision_recall_curve, average_precision_score,
+    accuracy_score,
+    average_precision_score,
+    classification_report,
+    confusion_matrix,
+    f1_score,
+    precision_recall_curve,
+    precision_score,
+    recall_score,
+    roc_auc_score,
+    roc_curve,
 )
 
 logger = logging.getLogger(__name__)
@@ -168,5 +177,5 @@ if __name__ == "__main__":
     from src.train_model import run_training_pipeline
 
     model, results_df, X_test, y_test, feature_names = run_training_pipeline()
-    metrics = run_full_evaluation(model, X_test, y_test, feature_names, results_df)
+    run_full_evaluation(model, X_test, y_test, feature_names, results_df)
     print(f"\nAll evaluation plots saved to {FIGURES_DIR}/")
