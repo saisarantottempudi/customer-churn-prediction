@@ -1,0 +1,76 @@
+project:
+  name: "Customer Churn Prediction"
+  version: "1.0.0"
+  description: "End-to-end ML system for predicting customer churn and recommending retention actions"
+
+data:
+  raw_path: "data/raw/telco_churn.csv"
+  processed_path: "data/processed/churn_processed.csv"
+  target_column: "Churn"
+  customer_id_column: "customerID"
+  test_size: 0.2
+  random_state: 42
+
+features:
+  numerical:
+    - tenure
+    - MonthlyCharges
+    - TotalCharges
+  categorical:
+    - gender
+    - SeniorCitizen
+    - Partner
+    - Dependents
+    - PhoneService
+    - MultipleLines
+    - InternetService
+    - OnlineSecurity
+    - OnlineBackup
+    - DeviceProtection
+    - TechSupport
+    - StreamingTV
+    - StreamingMovies
+    - Contract
+    - PaperlessBilling
+    - PaymentMethod
+  engineered:
+    - tenure_group
+    - monthly_charge_band
+    - total_spend_category
+    - contract_risk_score
+    - payment_risk_score
+    - customer_value_segment
+
+model:
+  best_model: "RandomForest"
+  path: "models/churn_model.pkl"
+  pipeline_path: "models/preprocessing_pipeline.pkl"
+  threshold: 0.5
+  cv_folds: 5
+
+risk_segments:
+  low:
+    max_probability: 0.35
+    label: "Low Risk"
+  medium:
+    min_probability: 0.35
+    max_probability: 0.65
+    label: "Medium Risk"
+  high:
+    min_probability: 0.65
+    label: "High Risk"
+
+api:
+  host: "0.0.0.0"
+  port: 8000
+  reload: false
+  model_version: "1.0.0"
+  training_date: "2026-05-01"
+
+database:
+  url: "sqlite:///./churn_predictions.db"
+
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "logs/app.log"
