@@ -6,15 +6,14 @@ Generates comprehensive evaluation metrics, plots, and a model report.
 
 import logging
 import os
-import json
 import numpy as np
 import pandas as pd
 import matplotlib
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt
-import seaborn as sns
+import matplotlib.pyplot as plt  # noqa: E402
+import seaborn as sns  # noqa: E402
 
-from sklearn.metrics import (
+from sklearn.metrics import (  # noqa: E402
     accuracy_score, precision_score, recall_score, f1_score,
     roc_auc_score, confusion_matrix, classification_report,
     roc_curve, precision_recall_curve, average_precision_score,
@@ -164,7 +163,7 @@ def run_full_evaluation(model, X_test, y_test, feature_names: list, results_df: 
 
 
 if __name__ == "__main__":
-    import sys, joblib
+    import sys
     sys.path.insert(0, ".")
     from src.train_model import run_training_pipeline
 

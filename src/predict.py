@@ -235,5 +235,4 @@ if __name__ == "__main__":
         "TotalCharges": "267.30",
     }
     result = predict_single(sample)
-    import json
     print(json.dumps(result, indent=2))

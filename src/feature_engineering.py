@@ -10,10 +10,9 @@ import os
 import joblib
 import yaml
 import pandas as pd
-import numpy as np
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
-from sklearn.preprocessing import StandardScaler, OneHotEncoder, LabelEncoder
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.impute import SimpleImputer
 
 logger = logging.getLogger(__name__)
@@ -222,9 +221,6 @@ def load_pipeline(path: str = "models/preprocessing_pipeline.pkl"):
 
 
 if __name__ == "__main__":
-    import yaml
-    from src.data_preprocessing import load_raw_data, run_preprocessing_pipeline
-
     config = load_config()
     df = pd.read_csv(config["data"]["processed_path"])
     X, y, pipe, feat_names = prepare_features(df, config, fit=True)

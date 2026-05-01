@@ -200,7 +200,8 @@ def build_full_recommendation_output(prediction_result: dict, customer_data: dic
 
 
 if __name__ == "__main__":
-    import json, sys
+    import json
+    import sys
     sys.path.insert(0, ".")
     from src.predict import predict_single
 

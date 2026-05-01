@@ -14,22 +14,21 @@ import logging
 import os
 import sys
 from contextlib import asynccontextmanager
-from datetime import datetime
 from typing import List
-
-import pandas as pd
-import yaml
-from fastapi import FastAPI, HTTPException, Depends, status
-from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy.orm import Session
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from api.schemas import (
+import pandas as pd  # noqa: E402
+import yaml  # noqa: E402
+from fastapi import FastAPI, HTTPException, Depends, status  # noqa: E402
+from fastapi.middleware.cors import CORSMiddleware  # noqa: E402
+from sqlalchemy.orm import Session  # noqa: E402
+
+from api.schemas import (  # noqa: E402
     CustomerInput, PredictionResponse, HealthResponse,
     ModelInfoResponse, BatchPredictionResponse, BatchPredictionRow,
 )
-from api.database import init_db, get_db, log_prediction
+from api.database import init_db, get_db, log_prediction  # noqa: E402
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")

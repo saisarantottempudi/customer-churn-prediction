@@ -9,7 +9,6 @@ import logging
 import os
 import yaml
 import pandas as pd
-import numpy as np
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
@@ -136,7 +135,8 @@ def run_preprocessing_pipeline(config_path: str = "config.yaml") -> pd.DataFrame
     report = inspect_data(df)
     logger.info(f"Data shape: {report['shape']}")
     logger.info(f"Duplicates: {report['duplicates']}")
-    logger.info(f"Missing values: { {k:v for k,v in report['missing_values'].items() if v > 0} }")
+    missing = {k: v for k, v in report['missing_values'].items() if v > 0}
+    logger.info(f"Missing values: {missing}")
     logger.info(f"Target distribution: {report['target_distribution']}")
 
     df = standardize_categoricals(df)

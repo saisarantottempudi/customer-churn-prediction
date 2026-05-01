@@ -18,7 +18,6 @@ from sklearn.model_selection import train_test_split, StratifiedKFold, cross_val
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
-from sklearn.svm import SVC
 from xgboost import XGBClassifier
 from lightgbm import LGBMClassifier
 from imblearn.over_sampling import SMOTE
@@ -136,7 +135,7 @@ def run_training_pipeline(config_path: str = "config.yaml"):
     """Full training pipeline: load data -> engineer features -> train -> save."""
     import sys
     sys.path.insert(0, ".")
-    from src.feature_engineering import prepare_features, save_pipeline, load_config as fe_load_config
+    from src.feature_engineering import prepare_features, save_pipeline
 
     config = load_config(config_path)
     random_state = config["data"]["random_state"]
@@ -191,4 +190,4 @@ def run_training_pipeline(config_path: str = "config.yaml"):
 
 if __name__ == "__main__":
     model, results, X_test, y_test, feat_names = run_training_pipeline()
-    print(f"\nTraining complete. Model saved to models/churn_model.pkl")
+    print("\nTraining complete. Model saved to models/churn_model.pkl")
